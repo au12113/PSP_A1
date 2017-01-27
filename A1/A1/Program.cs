@@ -11,29 +11,24 @@ namespace A1
     {
         static void Main(string[] args)
         {
-            //List<double> input = new List<double> { 160,591,114,229,230,270,128,1657,624,1503 };
-            //List<double> input2 = new List<double> { 15, 69.9, 6.5, 22.4, 28.4, 65.9, 19.4, 198.7, 38.8, 138.2};
-            string inputFile = "input.txt";
+            string inputFile = args[0];
             List<List<double>> inputData = GetData(inputFile);
             foreach(List<double> item in inputData)
             {
-                Console.WriteLine(inputData.IndexOf(item));
-                item.ForEach(Console.WriteLine);
-            }
-            //Console.WriteLine("{0:N2}",stdDev());            
+                Console.WriteLine("Column {0}\tMean: {1:N2}\tStd.Dev: {2:N2}", inputData.IndexOf(item),Mean(item) ,stdDev(item));
+            }     
             Console.ReadKey();
         }
 
         static List<List<double>> GetData(string filename)
         {
             string line;
-            bool firstRow = true;
-            int column = 0;
-            List<List<double>> inputData = new List<List<double>>();
+            bool firstRow = true;   //trigger for initial List<double> at first line.
+            int column = 0; //count column in each line.
+            List<List<double>> inputData = new List<List<double>>();    //try to make 2-dimention list to keep data with dynamic table.
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@filename);
             while (( line = inputFile.ReadLine()) != null)
             {
-                Console.WriteLine(line);
                 string[] words = line.Split('\t');
                 column = 0;
                 if (firstRow)   //initial List<double> at first time.
@@ -41,13 +36,12 @@ namespace A1
                     for (int i = 0; i < words.Count(); i++)
                     {
                         List<double> dataColumn = new List<double>();
-                        inputData.Add(dataColumn);
+                        inputData.Add(dataColumn);  //then add List<double> to parent(List<List<double>>)
                     }
                     firstRow = false;
                 }
-                foreach (string item in words)
+                foreach (string item in words)  //add converted data to each list.
                 {
-                    //Console.WriteLine(item);
                     inputData[column].Add(Convert.ToDouble(item));
                     column++;
                 }
