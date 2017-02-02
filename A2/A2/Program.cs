@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*Test Block Comment
+sdfasdf
+asdfasdfas
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -111,19 +115,22 @@ namespace A2
             if (line.Count() > 0)
             {
                 if (isBlockComment)
-                {
                     return 0;
-                }
                 else
                 {
                     if (symbolOrder[0].Count > 0)
                     {
-                        if (symbolOrder[0].First() < 1)
+                        if (symbolOrder[0].First() < 2)
                             return 0;
                     }
                     else if (symbolOrder[1].Count > 0)
                     {
                         if (symbolOrder[1].First() < 2)
+                            return 0;
+                    }
+                    else if (symbolOrder[3].Count > 0)
+                    {
+                        if (symbolOrder[3].First() == line.Count())
                             return 0;
                     }
                     return 1;
