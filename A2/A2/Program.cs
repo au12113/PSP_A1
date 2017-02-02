@@ -21,7 +21,7 @@ namespace A2
             string line;
             int count = 1;
             bool isBlockComment = false;
-            List<List<int>> symbolOrder = new List<List<int>>(); //symbolOrder[0] is "//" order, symbolOrder[1] is "/*" order, symbolOrder[2] is "*/" order and symbolOrder[3] is """ order.
+            List<List<int>> symbolOrder = new List<List<int>>(); //symbolOrder[0] is // order, symbolOrder[1] is /* order, symbolOrder[2] is */ order and symbolOrder[3] is " order.
             while (( line = inputFile.ReadLine()) != null)
             {
                 line = line.Trim();
@@ -65,25 +65,45 @@ namespace A2
                 {
                     if (symbolOrder[3].Count > 0)  //If line contains '"', then must check comment doesn't in qoute.
                     {
-                    }
-                    else
-                    {
-                        if(symbolOrder[0].Count > 0 || symbolOrder[1].Count > 0)
+                        if (symbolOrder[0].Count > 0 && symbolOrder[1].Count > 0)
                         {
-                            /* Line contains // and /*, then this line maybe has the start of block  */
-                            if (symbolOrder[0].Count > 0 && symbolOrder[1].Count > 0)
-                            {
-                                /* found the start of BlockComment  */
-                                if (symbolOrder[1].First() < symbolOrder[0].First())
-                                    isBlockComment = true;
-                            }
-                            if (symbolOrder[1].Count > 0)
+                            if (symbolOrder[3].First() < symbolOrder[0].First() && symbolOrder[3].First() < symbolOrder[1].First())
+                                return 0;
+                        }
+                        else if (symbolOrder[1].Count > 0)
+                        {
+                            if (symbolOrder[3].First() < symbolOrder[1].First() && symbolOrder[3].Last() > symbolOrder[1].First())
+                                return 0;
+                        }
+                        else if(symbolOrder[0].Count > 0)
+                        {
+                            if (symbolOrder[3].First() < symbolOrder[0].First() && symbolOrder[3].Last() > symbolOrder[0].First())
+                                return 0;
+                        }
+                    }
+                    if (symbolOrder[0].Count > 0 || symbolOrder[1].Count > 0)
+                    {
+                        /* Line contains // and /*, then this line maybe has the start of block  */
+                        if (symbolOrder[0].Count > 0 && symbolOrder[1].Count > 0)
+                        {
+                            /* found the start of BlockComment  */
+                            if (symbolOrder[1].First() < symbolOrder[0].First())
                                 isBlockComment = true;
-                            return 1;
                         }
                         else
-                            return 0;
+                        {
+                            if (symbolOrder[1].Count > 0)
+                                isBlockComment = true;
+                        }
+                        if(symbolOrder[2].Count > 0)
+                        {
+                            if (symbolOrder[2].First() > symbolOrder[1].First())
+                                isBlockComment = false;
+                        }
+                        return 1;
                     }
+                    else
+                        return 0;
                 }
             }
             else 
