@@ -14,25 +14,40 @@ namespace A2
     class Program
     {
         /* Define data type name and */
-        static List<string> TYPENAME = new List<string>{ "string", "int", "double", "float", "bool", "void", "const", "List"};
+        static List<string> TYPENAME = new List<string>{ "string", "int", "double", "float", "bool", "List"};
         static List<string> ACCESSTYPE = new List<string> { "public", "private", "protected", "internal", "static"};
 
         public class Added
         {
             public bool _isAddedLine { get; set; }
             public int _sizeOf { get; set; }
+            public Added()
+            {
+                _isAddedLine = false;
+                TYPENAME.Add("Added");
+            }
         }
 
         public class Modified
         {
             public bool _isModifiedLine { get; set; }
             public int _sizeOf { get; set; }
+            public Modified()
+            {
+                _isModifiedLine = false;
+                TYPENAME.Add("Modified");
+            }
         }
 
         public class Deleted
         {
             public bool _isDeletedLine { get; set; }
             public int _sizeOf { get; set; }
+            public Deleted()
+            {
+                _isDeletedLine = false;
+                TYPENAME.Add("Deleted");
+            }
         }
 
         public class Class
@@ -41,6 +56,18 @@ namespace A2
             public int _item { get; set; }
             public int _sizeOf { get; set; }
             public bool _isClass { get; set; }
+            public Class()
+            {
+                _isClass = false;
+                TYPENAME.Add("Class");
+            }
+            public void Clear()
+            {
+                _name = String.Empty;
+                _item = 0;
+                _sizeOf = 0;
+                _isClass = false;
+            }
         }
 
         public class Function
@@ -49,6 +76,20 @@ namespace A2
             public int _item { get; set; }
             public int _sizeOf { get; set; }
             public bool _isFunction { get; set; }
+            public int _bracket { get; set; }
+            public Function()
+            {
+                _isFunction = false;
+                TYPENAME.Add("Function");
+            }
+            public void Clear()
+            {
+                _name = String.Empty;
+                _item = 0;
+                _sizeOf = 0;
+                _isFunction = false;
+                _bracket = 0;
+            }
         }
 
         static void Main(string[] args)
@@ -60,31 +101,34 @@ namespace A2
 
             string line;
             int count = 1;
-            int commentLine = 0 , codeLine = 0;
+            int commentLine = 0;
+            int codeLine = 0;
             bool isBlockComment = false;
             //symbolOrder[0] is // order, symbolOrder[1] is "/*" order, symbolOrder[2] is "*/" order and symbolOrder[3] is " order.
             List<List<int>> symbolOrder = new List<List<int>>(); 
             Added addedLine = new Added();
             Modified modifiedLine = new Modified();
             Deleted deletedLine = new Deleted();
-            Function funtionLine = new Function();
+            Function functionLine = new Function();
             Class classLine = new Class();
 
             while ((line = inputFile.ReadLine()) != null)
             {
                 line = line.Trim();
                 Console.WriteLine(line);
-                getstringOrder(line, ref symbolOrder);
+                getstrOrder(line, ref symbolOrder);
                 commentLine = commentLine + isComment(line, ref isBlockComment, ref symbolOrder);
-                codeLine = codeLine + isCode(line, ref isBlockComment, ref symbolOrder);
-                //isFunction(line, ref functionLine, ref symbolOrder);
+                codeLine = codeLine + isCode(line, ref isBlockComment, ref symbolOrder,ref functionLine,ref classLine);
+                
                 //isClass(line, ref classLine, ref symbolOrder);
-                isItem(line, ref symbolOrder);
+
+                /*only added,deleted and modified use no space string */
                 line = line.Replace(" ", String.Empty);
                 isAdded(line, ref addedLine);
                 isDeleted(line, ref deletedLine);
                 isModified(line, ref modifiedLine);
-                symbolOrder.Clear();   //Clear List for new line.
+                /*Clear List for next line.*/
+                symbolOrder.Clear();   
                 count++;
             }
             Console.WriteLine("Code: {0} line(s), Comment: {1} line(s).", codeLine, commentLine);
@@ -92,7 +136,7 @@ namespace A2
             Console.ReadKey();
         }
         
-        static void getstringOrder(string line, ref List<List<int>> symbolOrder)
+        static void getstrOrder(string line, ref List<List<int>> symbolOrder)
         {
             symbolOrder.Add(findOrder(line, "//"));
             symbolOrder.Add(findOrder(line, "/*"));
@@ -163,7 +207,7 @@ namespace A2
             }
         }
         
-        static int isCode(string line,ref bool isBlockComment, ref List<List<int>> symbolOrder)
+        static int isCode(string line,ref bool isBlockComment, ref List<List<int>> symbolOrder, ref Function functionLine,ref Class classLine)
         {
             if (line.Count() > 0)
             {
@@ -186,6 +230,7 @@ namespace A2
                         if (symbolOrder[3].First() == line.Count())
                             return 0;
                     }
+                    isFunction(line, ref functionLine, ref symbolOrder);
                     return 1;
                 }
             }
@@ -245,40 +290,89 @@ namespace A2
         {
             if(functionLine._isFunction)
             {
-
-                functionLine._item += isItem(line, ref symbolOrder);
+                if (line == "{")
+                    functionLine._bracket++;
+                if (line == "}")
+                {
+                    functionLine._bracket--;
+                    if (functionLine._bracket == 0)
+                    {
+                        Console.WriteLine(functionLine._item);
+                        functionLine.Clear();
+                    }
+                }
+                functionLine._item += isIteminFunction(line, ref symbolOrder, functionLine._isFunction, false);
             }
             else
             {
-                if() 
+                /*found accesstype typename and (), so it's function*/
+                if ( findListinStr(line, 1) && line.Contains("(")) 
                 {
-
-                    functionLine._item += isItem(line, ref symbolOrder);
+                    functionLine._isFunction = true;
+                    functionLine._item += isIteminFunction(line, ref symbolOrder,functionLine._isFunction,false);
                 }
-                else //if this line isn't function, so didn't count item in this line.
-                {
-
-                }
+                /*if this line isn't function, so didn't count item in this line.*/
             }
         }
 
-        public static int isItem(string line, ref List<List<int>> symbolOrder)
+        /*use bool isFunction to check passed data in fuction*/
+        public static int isIteminFunction(string line, ref List<List<int>> symbolOrder, bool isFunction, bool somth)
         {
-            if(symbolOrder[3].Count > 0)
+            int tmp = 0;
+            foreach(string type in TYPENAME)
             {
-                return 0;
+                //note: Can't use new in comment, that after code section in same line
+                if (line.Contains("new") && !line.Contains("\"new\""))
+                {
+                    tmp++;
+                    break;
+                }
+                else if (line.Contains(type)&&!line.Contains("\""+type))
+                {
+                    //note: can't use variable type name be part of function or class name)
+                    /*variable that declare in function*/
+                    if (line.IndexOf(type) < 1)
+                        tmp++;
+                    else if (isFunction)
+                    {
+                        if (type != "List" && line.Contains("("))    //ignore "List", so use variable type in List to identify this item.
+                        {
+                            //function has parameter(s), so parameter(s) maybe one or more in same variable type.
+                            List<int> itemOrder = findOrder(line, type);
+                            for (int i = 0; i < itemOrder.Count; i++)
+                            {
+                                if( itemOrder[i] > line.IndexOf("("))
+                                {
+                                    tmp++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return tmp;
+        }
+
+        /*ues search in 0 to search with TYPENAME, and 1 to search with ACCESSTYPE*/
+        public static bool findListinStr(string line, int searchin)
+        {
+            if(searchin==0)
+            {
+                foreach (string item in TYPENAME)
+                {
+                    if(line.Contains(item))
+                        return true;
+                }
             }
             else
             {
-                foreach(string type in TYPENAME)
+                foreach (string item in ACCESSTYPE)
                 {
-                    if(line.Contains(type))
-                    {
-                        return 1;
-                    }
+                    if (line.Contains(item))
+                        return true;
                 }
-                return 0;
             }
+            return false;
         }
 
         public static List<int> findOrder(string line, string searchString)
