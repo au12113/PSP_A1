@@ -19,33 +19,33 @@ namespace A2
 
         public class Added
         {
-            public bool _isAddedLine { get; set; }
+            public bool _isAddLine { get; set; }
             public int _sizeOf { get; set; }
             public Added()
             {
-                _isAddedLine = false;
+                _isAddLine = false;
                 TYPENAME.Add("Added");
             }
         }
 
         public class Modified
         {
-            public bool _isModifiedLine { get; set; }
+            public bool _isModifyLine { get; set; }
             public int _sizeOf { get; set; }
             public Modified()
             {
-                _isModifiedLine = false;
+                _isModifyLine = false;
                 TYPENAME.Add("Modified");
             }
         }
 
         public class Deleted
         {
-            public bool _isDeletedLine { get; set; }
+            public bool _isDeleteLine { get; set; }
             public int _sizeOf { get; set; }
             public Deleted()
             {
-                _isDeletedLine = false;
+                _isDeleteLine = false;
                 TYPENAME.Add("Deleted");
             }
         }
@@ -55,10 +55,10 @@ namespace A2
             public string _name { get; set; }
             public int _item { get; set; }
             public int _sizeOf { get; set; }
-            public bool _isClass { get; set; }
+            public bool _isclass { get; set; }
             public Class()
             {
-                _isClass = false;
+                _isclass = false;
                 TYPENAME.Add("Class");
             }
             public void Clear()
@@ -66,7 +66,7 @@ namespace A2
                 _name = String.Empty;
                 _item = 0;
                 _sizeOf = 0;
-                _isClass = false;
+                _isclass = false;
             }
         }
 
@@ -75,11 +75,11 @@ namespace A2
             public string _name { get; set; }
             public int _item { get; set; }
             public int _sizeOf { get; set; }
-            public bool _isFunction { get; set; }
+            public bool _isfunction { get; set; }
             public int _bracket { get; set; }
             public Function()
             {
-                _isFunction = false;
+                _isfunction = false;
                 TYPENAME.Add("Function");
             }
             public void Clear()
@@ -87,7 +87,7 @@ namespace A2
                 _name = String.Empty;
                 _item = 0;
                 _sizeOf = 0;
-                _isFunction = false;
+                _isfunction = false;
                 _bracket = 0;
             }
         }
@@ -240,55 +240,55 @@ namespace A2
         
         public static void isAdded(string line,ref Added addedLine)
         {
-            if(addedLine._isAddedLine)
+            if(addedLine._isAddLine)
             {
                 if (line.Contains("/*ADDED*/"))
-                    addedLine._isAddedLine = false;
+                    addedLine._isAddLine = false;
                 else
                     addedLine._sizeOf++;
             }
             else
             {
                 if (line.Contains("/*ADDED*/"))
-                    addedLine._isAddedLine = true;
+                    addedLine._isAddLine = true;
             }
         }
 
         public static void isModified(string line, ref Modified modifiedLine)
         {
-            if (modifiedLine._isModifiedLine)
+            if (modifiedLine._isModifyLine)
             {
                 if (line.Contains("/*MODIFIED*/"))
-                    modifiedLine._isModifiedLine = false;
+                    modifiedLine._isModifyLine = false;
                 else
                     modifiedLine._sizeOf++;
             }
             else
             {
                 if (line.Contains("/*MODIFIED*/"))
-                    modifiedLine._isModifiedLine = true;
+                    modifiedLine._isModifyLine = true;
             }
         }
 
         public static void isDeleted(string line, ref Deleted deletedLine)
         {
-            if (deletedLine._isDeletedLine)
+            if (deletedLine._isDeleteLine)
             {
                 if (line.Contains("/*DELETED*/"))
-                    deletedLine._isDeletedLine = false;
+                    deletedLine._isDeleteLine = false;
                 else
                     deletedLine._sizeOf++;
             }
             else
             {
                 if (line.Contains("/*DELETED*/"))
-                    deletedLine._isDeletedLine = true;
+                    deletedLine._isDeleteLine = true;
             }
         }
 
         public static void isFunction(string line, ref Function functionLine, ref List<List<int>> symbolOrder)
         {
-            if(functionLine._isFunction)
+            if(functionLine._isfunction)
             {
                 if (line == "{")
                     functionLine._bracket++;
@@ -301,22 +301,22 @@ namespace A2
                         functionLine.Clear();
                     }
                 }
-                functionLine._item += isIteminFunction(line, ref symbolOrder, functionLine._isFunction, false);
+                functionLine._item += isIteminFunction(line, functionLine._isfunction);
             }
             else
             {
                 /*found accesstype typename and (), so it's function*/
                 if ( findListinStr(line, 1) && line.Contains("(")) 
                 {
-                    functionLine._isFunction = true;
-                    functionLine._item += isIteminFunction(line, ref symbolOrder,functionLine._isFunction,false);
+                    functionLine._isfunction = true;
+                    functionLine._item += isIteminFunction(line,functionLine._isfunction);
                 }
                 /*if this line isn't function, so didn't count item in this line.*/
             }
         }
 
         /*use bool isFunction to check passed data in fuction*/
-        public static int isIteminFunction(string line, ref List<List<int>> symbolOrder, bool isFunction, bool somth)
+        public static int isIteminFunction(string line, bool isfunction)
         {
             int tmp = 0;
             foreach(string type in TYPENAME)
@@ -329,11 +329,11 @@ namespace A2
                 }
                 else if (line.Contains(type)&&!line.Contains("\""+type))
                 {
-                    //note: can't use variable type name be part of function or class name)
+                    //note: can't use variable type name cantains function or class name)
                     /*variable that declare in function*/
                     if (line.IndexOf(type) < 1)
                         tmp++;
-                    else if (isFunction)
+                    else if (isfunction)
                     {
                         if (type != "List" && line.Contains("("))    //ignore "List", so use variable type in List to identify this item.
                         {
