@@ -6,6 +6,7 @@ asdfasdfas
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,9 +57,11 @@ namespace A2
             public int _item { get; set; }
             public int _sizeOf { get; set; }
             public bool _isclass { get; set; }
+            public int _bracket { get; set; }
             public Class()
             {
                 _isclass = false;
+                _sizeOf = 0;
                 TYPENAME.Add("Class");
             }
             public void Clear()
@@ -67,6 +70,7 @@ namespace A2
                 _item = 0;
                 _sizeOf = 0;
                 _isclass = false;
+                _bracket = 0;
             }
         }
 
@@ -80,6 +84,7 @@ namespace A2
             public Function()
             {
                 _isfunction = false;
+                _sizeOf = 0;
                 TYPENAME.Add("Function");
             }
             public void Clear()
@@ -230,7 +235,8 @@ namespace A2
                         if (symbolOrder[3].First() == line.Count())
                             return 0;
                     }
-                    isFunction(line, ref functionLine, ref symbolOrder);
+                    isFunction(line, ref functionLine);
+                    isClass(line, ref classLine);
                     return 1;
                 }
             }
@@ -286,37 +292,80 @@ namespace A2
             }
         }
 
-        public static void isFunction(string line, ref Function functionLine, ref List<List<int>> symbolOrder)
+        public static void isClass(string line, ref Class classLine)
+        {
+            if (classLine._isclass)
+            {
+                if (line == "}")
+                {
+                    classLine._bracket--;
+                    classLine._sizeOf++;
+                    if (classLine._bracket == 0)
+                    {
+                        Console.WriteLine("class Name: {0}, Size: {1}", classLine._name, classLine._sizeOf);
+                        classLine.Clear();
+                    }
+                }
+                else
+                {
+                    if (line == "{")
+                        classLine._bracket++;
+                    classLine._sizeOf++;
+                    classLine._item += isItem(line, classLine._isclass);
+                }
+            }
+            else
+            {
+                /*found accesstype typename and (), so it's class*/
+                if (findAccessTypeinStr(line) && line.Contains("class"))
+                {
+                    string[] tmp = line.Split(' ');
+                    classLine._name = tmp.Last();
+                    classLine._isclass = true;
+                    classLine._sizeOf++;
+                }
+            }
+        }
+
+        public static void isFunction(string line, ref Function functionLine)
         {
             if(functionLine._isfunction)
             {
-                if (line == "{")
-                    functionLine._bracket++;
                 if (line == "}")
                 {
                     functionLine._bracket--;
+                    functionLine._sizeOf++;
                     if (functionLine._bracket == 0)
                     {
-                        Console.WriteLine(functionLine._item);
-                        functionLine.Clear();
+                        Console.WriteLine("function Name: {0}, Size: {1}",functionLine._name,functionLine._sizeOf);
+                         functionLine.Clear();
                     }
                 }
-                functionLine._item += isIteminFunction(line, functionLine._isfunction);
+                else
+                {
+                    if (line == "{")
+                        functionLine._bracket++;
+                    functionLine._sizeOf++;
+                    functionLine._item += isItem(line, functionLine._isfunction);
+                }
             }
             else
             {
                 /*found accesstype typename and (), so it's function*/
-                if ( findListinStr(line, 1) && line.Contains("(")) 
+                if (findAccessTypeinStr(line) && line.Contains("(")) 
                 {
+                    string[] tmp = Convert.ToString(Regex.Match(line, @" .*?\(")).Split(' ');
+                    functionLine._name = tmp.Last().Replace("(",String.Empty);
                     functionLine._isfunction = true;
-                    functionLine._item += isIteminFunction(line,functionLine._isfunction);
+                    functionLine._sizeOf++;
+                    functionLine._item += isItem(line,functionLine._isfunction);
                 }
                 /*if this line isn't function, so didn't count item in this line.*/
             }
         }
 
         /*use bool isFunction to check passed data in fuction*/
-        public static int isIteminFunction(string line, bool isfunction)
+        public static int isItem(string line, bool isfunction)
         {
             int tmp = 0;
             foreach(string type in TYPENAME)
@@ -354,23 +403,12 @@ namespace A2
         }
 
         /*ues search in 0 to search with TYPENAME, and 1 to search with ACCESSTYPE*/
-        public static bool findListinStr(string line, int searchin)
+        public static bool findAccessTypeinStr(string line)
         {
-            if(searchin==0)
+            foreach (string item in ACCESSTYPE)
             {
-                foreach (string item in TYPENAME)
-                {
-                    if(line.Contains(item))
-                        return true;
-                }
-            }
-            else
-            {
-                foreach (string item in ACCESSTYPE)
-                {
-                    if (line.Contains(item))
-                        return true;
-                }
+                if (line.Contains(item))
+                    return true;
             }
             return false;
         }
