@@ -317,7 +317,7 @@ namespace A2
             else
             {
                 /*found accesstype typename and (), so it's class*/
-                if (findAccessTypeinStr(line) && line.Contains("class"))
+                if (findAccessTypeinStr(line) && line.Contains("class") && !line.Contains("("))
                 {
                     string[] tmp = line.Split(' ');
                     classLine._name = tmp.Last();
