@@ -14,8 +14,8 @@ namespace A2
     class Program
     {
         /* Define data type name and */
-        public List<string> typeName = new List<string>{ "string", "int", "double", "float", "bool", "void", "const"};
-        public List<string> accesstype = new List<string> { "public", "private", "protected", "internal", "static"};
+        static List<string> TYPENAME = new List<string>{ "string", "int", "double", "float", "bool", "void", "const", "List"};
+        static List<string> ACCESSTYPE = new List<string> { "public", "private", "protected", "internal", "static"};
 
         public class Added
         {
@@ -37,14 +37,18 @@ namespace A2
 
         public class Class
         {
-            int item { get; set; }
-            int sizeOf { get; set; }
+            public string _name { get; set; }
+            public int _item { get; set; }
+            public int _sizeOf { get; set; }
+            public bool _isClass { get; set; }
         }
 
         public class Function
         {
-            int item { get; set; }
-            int sizeOf { get; set; }
+            public string _name { get; set; }
+            public int _item { get; set; }
+            public int _sizeOf { get; set; }
+            public bool _isFunction { get; set; }
         }
 
         static void Main(string[] args)
@@ -53,26 +57,31 @@ namespace A2
             //string fileName = args[0];
             string fileName = "../../Program.cs";
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@fileName);
-            
 
             string line;
             int count = 1;
             int commentLine = 0 , codeLine = 0;
             bool isBlockComment = false;
-            List<List<int>> symbolOrder = new List<List<int>>(); //symbolOrder[0] is // order, symbolOrder[1] is /* order, symbolOrder[2] is */ order and symbolOrder[3] is " order.
+            //symbolOrder[0] is // order, symbolOrder[1] is "/*" order, symbolOrder[2] is "*/" order and symbolOrder[3] is " order.
+            List<List<int>> symbolOrder = new List<List<int>>(); 
             Added addedLine = new Added();
             Modified modifiedLine = new Modified();
             Deleted deletedLine = new Deleted();
-
+            Function funtionLine = new Function();
+            Class classLine = new Class();
 
             while ((line = inputFile.ReadLine()) != null)
             {
-                line = line.Replace(" ",String.Empty);
+                line = line.Trim();
                 Console.WriteLine(line);
                 getstringOrder(line, ref symbolOrder);
                 commentLine = commentLine + isComment(line, ref isBlockComment, ref symbolOrder);
                 codeLine = codeLine + isCode(line, ref isBlockComment, ref symbolOrder);
-                isAdded(line,ref addedLine);
+                //isFunction(line, ref functionLine, ref symbolOrder);
+                //isClass(line, ref classLine, ref symbolOrder);
+                isItem(line, ref symbolOrder);
+                line = line.Replace(" ", String.Empty);
+                isAdded(line, ref addedLine);
                 isDeleted(line, ref deletedLine);
                 isModified(line, ref modifiedLine);
                 symbolOrder.Clear();   //Clear List for new line.
@@ -229,6 +238,46 @@ namespace A2
             {
                 if (line.Contains("/*DELETED*/"))
                     deletedLine._isDeletedLine = true;
+            }
+        }
+
+        public static void isFunction(string line, ref Function functionLine, ref List<List<int>> symbolOrder)
+        {
+            if(functionLine._isFunction)
+            {
+
+                functionLine._item += isItem(line, ref symbolOrder);
+            }
+            else
+            {
+                if() 
+                {
+
+                    functionLine._item += isItem(line, ref symbolOrder);
+                }
+                else //if this line isn't function, so didn't count item in this line.
+                {
+
+                }
+            }
+        }
+
+        public static int isItem(string line, ref List<List<int>> symbolOrder)
+        {
+            if(symbolOrder[3].Count > 0)
+            {
+                return 0;
+            }
+            else
+            {
+                foreach(string type in TYPENAME)
+                {
+                    if(line.Contains(type))
+                    {
+                        return 1;
+                    }
+                }
+                return 0;
             }
         }
 
