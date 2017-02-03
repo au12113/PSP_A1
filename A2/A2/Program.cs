@@ -2,6 +2,7 @@
 sdfasdf
 asdfasdfas
 */
+/* ADDED */
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,33 +13,76 @@ namespace A2
 {
     class Program
     {
-        static void Main(string[] args)
+        /* Define data type name and */
+        public List<string> typeName = new List<string>{ "string", "int", "double", "float", "bool", "void", "const"};
+        public List<string> accesstype = new List<string> { "public", "private", "protected", "internal", "static"};
+
+        public class Added
         {
-            //string fileName = args[0];
-            ReadFile("../../Program.cs");
-            //Console.ReadKey();
+            public bool _isAddedLine { get; set; }
+            public int _sizeOf { get; set; }
         }
 
-        static void ReadFile(string fileName)
+        public class Modified
         {
+            public bool _isModifiedLine { get; set; }
+            public int _sizeOf { get; set; }
+        }
+
+        public class Deleted
+        {
+            public bool _isDeletedLine { get; set; }
+            public int _sizeOf { get; set; }
+        }
+
+        public class Class
+        {
+            int item { get; set; }
+            int sizeOf { get; set; }
+        }
+
+        public class Function
+        {
+            int item { get; set; }
+            int sizeOf { get; set; }
+        }
+
+        static void Main(string[] args)
+        {
+            /* Read File */
+            //string fileName = args[0];
+            string fileName = "../../Program.cs";
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@fileName);
+            
+
             string line;
             int count = 1;
-            int commentLine = 0;
+            int commentLine = 0 , codeLine = 0;
             bool isBlockComment = false;
             List<List<int>> symbolOrder = new List<List<int>>(); //symbolOrder[0] is // order, symbolOrder[1] is /* order, symbolOrder[2] is */ order and symbolOrder[3] is " order.
-            while (( line = inputFile.ReadLine()) != null)
+            Added addedLine = new Added();
+            Modified modifiedLine = new Modified();
+            Deleted deletedLine = new Deleted();
+
+
+            while ((line = inputFile.ReadLine()) != null)
             {
-                line = line.Trim();
+                line = line.Replace(" ",String.Empty);
+                Console.WriteLine(line);
                 getstringOrder(line, ref symbolOrder);
                 commentLine = commentLine + isComment(line, ref isBlockComment, ref symbolOrder);
-                Console.WriteLine("Line: {0}, {1}", count, line);
-                Console.WriteLine("ncode: {0}", isCode(line,ref isBlockComment,ref symbolOrder));
+                codeLine = codeLine + isCode(line, ref isBlockComment, ref symbolOrder);
+                isAdded(line,ref addedLine);
+                isDeleted(line, ref deletedLine);
+                isModified(line, ref modifiedLine);
                 symbolOrder.Clear();   //Clear List for new line.
                 count++;
             }
+            Console.WriteLine("Code: {0} line(s), Comment: {1} line(s).", codeLine, commentLine);
+            Console.WriteLine("Added: {0}.", addedLine._sizeOf);
+            Console.ReadKey();
         }
-
+        
         static void getstringOrder(string line, ref List<List<int>> symbolOrder)
         {
             symbolOrder.Add(findOrder(line, "//"));
@@ -140,6 +184,54 @@ namespace A2
                 return 0;
         }
         
+        public static void isAdded(string line,ref Added addedLine)
+        {
+            if(addedLine._isAddedLine)
+            {
+                if (line.Contains("/*ADDED*/"))
+                    addedLine._isAddedLine = false;
+                else
+                    addedLine._sizeOf++;
+            }
+            else
+            {
+                if (line.Contains("/*ADDED*/"))
+                    addedLine._isAddedLine = true;
+            }
+        }
+
+        public static void isModified(string line, ref Modified modifiedLine)
+        {
+            if (modifiedLine._isModifiedLine)
+            {
+                if (line.Contains("/*MODIFIED*/"))
+                    modifiedLine._isModifiedLine = false;
+                else
+                    modifiedLine._sizeOf++;
+            }
+            else
+            {
+                if (line.Contains("/*MODIFIED*/"))
+                    modifiedLine._isModifiedLine = true;
+            }
+        }
+
+        public static void isDeleted(string line, ref Deleted deletedLine)
+        {
+            if (deletedLine._isDeletedLine)
+            {
+                if (line.Contains("/*DELETED*/"))
+                    deletedLine._isDeletedLine = false;
+                else
+                    deletedLine._sizeOf++;
+            }
+            else
+            {
+                if (line.Contains("/*DELETED*/"))
+                    deletedLine._isDeletedLine = true;
+            }
+        }
+
         public static List<int> findOrder(string line, string searchString)
         {
             List<int> indexes = new List<int>();
@@ -153,3 +245,4 @@ namespace A2
         }
     }
 }
+/*ADDED*/
