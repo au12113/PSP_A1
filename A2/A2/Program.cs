@@ -100,8 +100,7 @@ namespace A2
         static void Main(string[] args)
         {
             /* Read File */
-            //string fileName = args[0];
-            string fileName = "../../Program.cs";
+            string fileName = args[0];
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@fileName);
 
             string line;
@@ -120,13 +119,9 @@ namespace A2
             while ((line = inputFile.ReadLine()) != null)
             {
                 line = line.Trim();
-                Console.WriteLine(line);
                 getstrOrder(line, ref symbolOrder);
                 commentLine = commentLine + isComment(line, ref isBlockComment, ref symbolOrder);
                 codeLine = codeLine + isCode(line, ref isBlockComment, ref symbolOrder,ref functionLine,ref classLine);
-                
-                //isClass(line, ref classLine, ref symbolOrder);
-
                 /*only added,deleted and modified use no space string */
                 line = line.Replace(" ", String.Empty);
                 isAdded(line, ref addedLine);
@@ -137,7 +132,7 @@ namespace A2
                 count++;
             }
             Console.WriteLine("Code: {0} line(s), Comment: {1} line(s).", codeLine, commentLine);
-            Console.WriteLine("Added: {0}.", addedLine._sizeOf);
+            Console.WriteLine("Added: {0}, Modified: {1}, Deleted: {2}. ", addedLine._sizeOf, modifiedLine._sizeOf, deletedLine._sizeOf);
             Console.ReadKey();
         }
         
@@ -235,8 +230,7 @@ namespace A2
                         if (symbolOrder[3].First() == line.Count())
                             return 0;
                     }
-                    isFunction(line, ref functionLine);
-                    isClass(line, ref classLine);
+                    isClass(line, ref classLine, ref functionLine);
                     return 1;
                 }
             }
@@ -246,53 +240,63 @@ namespace A2
         
         public static void isAdded(string line,ref Added addedLine)
         {
-            if(addedLine._isAddLine)
+            if(line.Count() > 0)
             {
-                if (line.Contains("/*ADDED*/"))
-                    addedLine._isAddLine = false;
+                if (addedLine._isAddLine)
+                {
+                    if (line == "/*ADDED*/")
+                        addedLine._isAddLine = false;
+                    else
+                        addedLine._sizeOf++;
+                }
                 else
-                    addedLine._sizeOf++;
+                {
+                    if (line == "/*ADDED*/")
+                        addedLine._isAddLine = true;
+                }
             }
-            else
-            {
-                if (line.Contains("/*ADDED*/"))
-                    addedLine._isAddLine = true;
-            }
+            
         }
 
         public static void isModified(string line, ref Modified modifiedLine)
         {
-            if (modifiedLine._isModifyLine)
+            if (line.Count() > 0)
             {
-                if (line.Contains("/*MODIFIED*/"))
-                    modifiedLine._isModifyLine = false;
+                if (modifiedLine._isModifyLine)
+                {
+                    if (line == "/*MODIFIED*/")
+                        modifiedLine._isModifyLine = false;
+                    else
+                        modifiedLine._sizeOf++;
+                }
                 else
-                    modifiedLine._sizeOf++;
-            }
-            else
-            {
-                if (line.Contains("/*MODIFIED*/"))
-                    modifiedLine._isModifyLine = true;
+                {
+                    if (line == "/*MODIFIED*/")
+                        modifiedLine._isModifyLine = true;
+                }
             }
         }
 
         public static void isDeleted(string line, ref Deleted deletedLine)
         {
-            if (deletedLine._isDeleteLine)
+            if (line.Count() > 0)
             {
-                if (line.Contains("/*DELETED*/"))
-                    deletedLine._isDeleteLine = false;
+                if (deletedLine._isDeleteLine)
+                {
+                    if (line == "/*DELETED*/")
+                        deletedLine._isDeleteLine = false;
+                    else
+                        deletedLine._sizeOf++;
+                }
                 else
-                    deletedLine._sizeOf++;
-            }
-            else
-            {
-                if (line.Contains("/*DELETED*/"))
-                    deletedLine._isDeleteLine = true;
+                {
+                    if (line == "/*DELETED*/")
+                        deletedLine._isDeleteLine = true;
+                }
             }
         }
 
-        public static void isClass(string line, ref Class classLine)
+        public static void isClass(string line, ref Class classLine, ref Function functionLine)
         {
             if (classLine._isclass)
             {
@@ -302,7 +306,7 @@ namespace A2
                     classLine._sizeOf++;
                     if (classLine._bracket == 0)
                     {
-                        Console.WriteLine("class Name: {0}, Size: {1}", classLine._name, classLine._sizeOf);
+                        Console.WriteLine("class: {0}, item: {1}, size: {2}", classLine._name, classLine._item, classLine._sizeOf);
                         classLine.Clear();
                     }
                 }
@@ -311,7 +315,7 @@ namespace A2
                     if (line == "{")
                         classLine._bracket++;
                     classLine._sizeOf++;
-                    classLine._item += isItem(line, classLine._isclass);
+                    classLine._item += isItem(line, false,classLine._isclass);
                 }
             }
             else
@@ -324,6 +328,8 @@ namespace A2
                     classLine._isclass = true;
                     classLine._sizeOf++;
                 }
+                else
+                    isFunction(line, ref functionLine);
             }
         }
 
@@ -337,8 +343,8 @@ namespace A2
                     functionLine._sizeOf++;
                     if (functionLine._bracket == 0)
                     {
-                        Console.WriteLine("function Name: {0}, Size: {1}",functionLine._name,functionLine._sizeOf);
-                         functionLine.Clear();
+                        Console.WriteLine("function: {0}, item: {1}, size: {2}",functionLine._name, functionLine._item, functionLine._sizeOf);
+                        functionLine.Clear();
                     }
                 }
                 else
@@ -346,7 +352,7 @@ namespace A2
                     if (line == "{")
                         functionLine._bracket++;
                     functionLine._sizeOf++;
-                    functionLine._item += isItem(line, functionLine._isfunction);
+                    functionLine._item += isItem(line, functionLine._isfunction,false);
                 }
             }
             else
@@ -358,14 +364,14 @@ namespace A2
                     functionLine._name = tmp.Last().Replace("(",String.Empty);
                     functionLine._isfunction = true;
                     functionLine._sizeOf++;
-                    functionLine._item += isItem(line,functionLine._isfunction);
+                    functionLine._item += isItem(line,functionLine._isfunction,false);
                 }
                 /*if this line isn't function, so didn't count item in this line.*/
             }
         }
 
         /*use bool isFunction to check passed data in fuction*/
-        public static int isItem(string line, bool isfunction)
+        public static int isItem(string line, bool isfunction, bool isclass)
         {
             int tmp = 0;
             foreach(string type in TYPENAME)
@@ -393,6 +399,20 @@ namespace A2
                                 if( itemOrder[i] > line.IndexOf("("))
                                 {
                                     tmp++;
+                                }
+                            }
+                        }
+                    }
+                    else if(isclass)
+                    {
+                        if (type != "List")
+                        {
+                            foreach(string access in ACCESSTYPE)
+                            {
+                                if(line.Contains(access))
+                                {
+                                    tmp++;
+                                    break;
                                 }
                             }
                         }
