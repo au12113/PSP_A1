@@ -1,7 +1,9 @@
-﻿/*Test Block Comment
-sdfasdf
-asdfasdfas
-*/
+﻿/********************************************************************************************************/
+/* Program Assignment: A2                                                                               */
+/* Name:    Wasupon Tangsakul                                                                           */
+/* Date:    2/4/2017                                                                                    */
+/* Description: a program to count total program size, each parts size and number of item in each parts */
+/********************************************************************************************************/
 /* ADDED */
 using System;
 using System.Collections.Generic;
@@ -100,7 +102,8 @@ namespace A2
         static void Main(string[] args)
         {
             /* Read File */
-            string fileName = args[0];
+            //string fileName = args[0];
+            string fileName = "../../Program.cs";
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@fileName);
 
             string line;
