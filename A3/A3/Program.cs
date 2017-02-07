@@ -8,26 +8,28 @@ namespace A3
 {
     class Program
     {
+        /*ADDED*/
         public class PROGRAM
         {
-            double _estimatedProxySize { get; set; }
-            double _planAddedModified { get; set; }
-            double _actualAddedModified { get; set; }
-            double _actualDevHours { get; set; }
+            public double _estimatedProxy { get; set; }
+            public double _planAddedModified { get; set; }
+            public double _actualAddedModified { get; set; }
+            public double _actualDevHours { get; set; }
+            public void Clear()
+            {
+                _estimatedProxy = 0;
+                _planAddedModified = 0;
+                _actualAddedModified = 0;
+                _actualDevHours = 0;
+            }
         }
-
-        enum COLUMN
-        {
-            EstimatedProxySize,
-            PlanAddedModified,
-            ActualAddedModified,
-            ActualDevelopemoentHours
-        };
+        /*ADDED END*/
 
         static void Main(string[] args)
         {
             string filename = args[0];
             List<PROGRAM> inputProgram = GetData(filename);
+
         }
 
         /*BASE*/
@@ -35,43 +37,57 @@ namespace A3
         {
             string line;
             /*trigger for initial List<double> at first line.*/
-            bool firstRow = true;
+            //bool firstRow = true;                                                 //DELETED
+
             /*count column in each line.*/
             int column = 0;
-            List<PROGRAM> inputData = new List<PROGRAM>();  //MODIFIED
-            COLUMN columnName = new COLUMN();
+
+            List<PROGRAM> inputData = new List<PROGRAM>();                          //MODIFIED
+            PROGRAM tmpProgram = new PROGRAM();
+
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@filename);
             while ((line = inputFile.ReadLine()) != null)
             {
                 /*note: input file must use '\t' to seperate each column.*/ 
                 string[] words = line.Split('\t');
                 column = 0;
-                if (firstRow)   //initial List<double> at first time.
+                //if (firstRow)   //initial List<double> at first time.             //DELETED
+                //{                                                                 //DELETED
+                //    for (int i = 0; i < words.Count(); i++)                       //DELETED
+                //    {                                                             //DELETED
+                //        List<double> dataColumn = new List<double>();             //DELETED
+                //        inputData.Add(dataColumn);  //then add List<double> to parent(List<List<double>>)     //DELETED
+                //    }                                                             //DELETED
+                //    firstRow = false;                                             //DELETED
+                //}                                                                 //DELETED
+                foreach (string item in words)  //add converted data to each list. 
                 {
-                    for (int i = 0; i < words.Count(); i++)
-                    {
-                        PROGRAM dataColumn = new PROGRAM(); //MODIFIED
-                        inputData.Add(dataColumn);  //then add List<double> to parent(List<List<double>>)
-                    }
-                    firstRow = false;
+                    switch(column)                                                  //ADDED
+                    {                                                               //ADDED
+                        case 0:                                                     //ADDED
+                            tmpProgram._estimatedProxy = Convert.ToDouble(item);    //ADDED
+                            break;                                                  //ADDED
+                        case 1:                                                     //ADDED
+                            tmpProgram._planAddedModified = Convert.ToDouble(item); //ADDED
+                            break;                                                  //ADDED
+                        case 2:                                                     //ADDED
+                            tmpProgram._actualAddedModified = Convert.ToDouble(item);   //ADDED
+                            break;                                                  //ADDED
+                        case 3:                                                     //ADDED
+                            tmpProgram._actualDevHours = Convert.ToDouble(item);    //ADDED
+                            break;                                                  //ADDED
+                    }                                                               //ADDED
+                    //inputData[column].Add(Convert.ToDouble(item));                //DELETED
+                    column++;                                                       //DELETED
                 }
-                foreach (string item in words)  //add converted data to each list.
-                {
-                    switch(columnName)
-                    {
-                        case columnName.
-                    }
-                    column++;
-                }
-
             }
             inputFile.Close();
             return inputData;
         }
         /*BASED END*/
 
-            /*REUSED*/
-            static double Mean(List<double> data)
+        /*REUSED*/
+        static double Mean(List<double> data)
         {
             double sum = 0;
             foreach (double item in data)
@@ -94,5 +110,11 @@ namespace A3
             return Math.Sqrt(tmp / (data.Count - 1));
         }
         /*REUSED END*/
+
+        /*ADDED*/
+        static double B1(ref List<PROGRAM> inputData, )
+        {
+
+        }
     }
 }
