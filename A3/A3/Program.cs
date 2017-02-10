@@ -22,7 +22,8 @@ namespace A3
         {
             string filename = args[0];
             PROGRAM inputProgram = GetData(filename);
-
+            Console.WriteLine("Test 1; B0: {0}, B1: {1}, rxy: {2}, r^2: {3}, yk: {4}",
+                B1(ref inputProgram._estimatedProxy,ref inputProgram._actualAddedModified));
         }
 
         /*BASE*/
@@ -101,17 +102,19 @@ namespace A3
         }
         /*ADDED END*/
 
-        /*ADDED
-        static double Rxy(re)
+        /*ADDED*/
+        static double Rxy(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
         {
-
+            return ((comparedColumn1.Count * Sum(ref comparedColumn1, ref comparedColumn2)) - (Sum(ref comparedColumn1) * Sum(ref comparedColumn2)))
+                / Math.Sqrt(((comparedColumn1.Count * Sum(ref comparedColumn1, ref comparedColumn1)) - (Sum(ref comparedColumn1) * Sum(ref comparedColumn1)))  
+                * ((comparedColumn1.Count * Sum(ref comparedColumn2,ref comparedColumn2)) - (Sum(ref comparedColumn2) * Sum(ref comparedColumn2))));
         }
         /*ADDED END*/
 
-        /*ADDED
-        static double R2()
+        /*ADDED*/
+        static double R2(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
         {
-            return Rxy(ref )
+            return Rxy(ref comparedColumn1, ref comparedColumn2) * Rxy(ref comparedColumn1, ref comparedColumn2);
         }
 
         /*REUSED*/
