@@ -11,29 +11,22 @@ namespace A3
         /*ADDED*/
         public class PROGRAM
         {
-            public double _estimatedProxy { get; set; }
-            public double _planAddedModified { get; set; }
-            public double _actualAddedModified { get; set; }
-            public double _actualDevHours { get; set; }
-            public void Clear()
-            {
-                _estimatedProxy = 0;
-                _planAddedModified = 0;
-                _actualAddedModified = 0;
-                _actualDevHours = 0;
-            }
+            public List<double> _estimatedProxy { get; set; }
+            public List<double> _planAddedModified { get; set; }
+            public List<double> _actualAddedModified { get; set; }
+            public List<double> _actualDevHours { get; set; }
         }
         /*ADDED END*/
 
         static void Main(string[] args)
         {
             string filename = args[0];
-            List<PROGRAM> inputProgram = GetData(filename);
+            PROGRAM inputProgram = GetData(filename);
 
         }
 
         /*BASE*/
-        static List<PROGRAM> GetData(string filename) //MODIFIED
+        static PROGRAM GetData(string filename) //MODIFIED
         {
             string line;
             /*trigger for initial List<double> at first line.*/
@@ -42,7 +35,7 @@ namespace A3
             /*count column in each line.*/
             int column = 0;
 
-            List<PROGRAM> inputData = new List<PROGRAM>();                          //MODIFIED
+            PROGRAM inputData = new PROGRAM();                          //MODIFIED
             PROGRAM tmpProgram = new PROGRAM();
 
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@filename);
@@ -65,16 +58,16 @@ namespace A3
                     switch(column)                                                  //ADDED
                     {                                                               //ADDED
                         case 0:                                                     //ADDED
-                            tmpProgram._estimatedProxy = Convert.ToDouble(item);    //ADDED
+                            tmpProgram._estimatedProxy.Add(Convert.ToDouble(item));    //ADDED
                             break;                                                  //ADDED
                         case 1:                                                     //ADDED
-                            tmpProgram._planAddedModified = Convert.ToDouble(item); //ADDED
+                            tmpProgram._planAddedModified.Add(Convert.ToDouble(item)); //ADDED
                             break;                                                  //ADDED
                         case 2:                                                     //ADDED
-                            tmpProgram._actualAddedModified = Convert.ToDouble(item);   //ADDED
+                            tmpProgram._actualAddedModified.Add(Convert.ToDouble(item));   //ADDED
                             break;                                                  //ADDED
                         case 3:                                                     //ADDED
-                            tmpProgram._actualDevHours = Convert.ToDouble(item);    //ADDED
+                            tmpProgram._actualDevHours.Add(Convert.ToDouble(item));    //ADDED
                             break;                                                  //ADDED
                     }                                                               //ADDED
                     //inputData[column].Add(Convert.ToDouble(item));                //DELETED
@@ -85,6 +78,41 @@ namespace A3
             return inputData;
         }
         /*BASED END*/
+
+        /*ADDED*/
+        static double B1(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        {
+            return (Sum( ref comparedColumn1, ref comparedColumn2)-(comparedColumn1.Count * Mean(comparedColumn1) * Mean(comparedColumn2)))
+                /(Sum(ref comparedColumn1,ref comparedColumn1) - (comparedColumn1.Count * Mean(comparedColumn1) * Mean(comparedColumn1)));
+        }
+        /*ADDED END*/
+
+        /*ADDED*/
+        static double B0(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        {
+            return Mean(comparedColumn1) - (B1(ref comparedColumn1, ref comparedColumn2) - Mean(comparedColumn2));
+        }
+        /*ADDED END*/
+
+        /*ADDED*/
+        static double Yk(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        {
+            return B0(ref comparedColumn1, ref comparedColumn2) + (B1(ref comparedColumn1, ref comparedColumn2) * Mean(comparedColumn1));
+        }
+        /*ADDED END*/
+
+        /*ADDED
+        static double Rxy(re)
+        {
+
+        }
+        /*ADDED END*/
+
+        /*ADDED
+        static double R2()
+        {
+            return Rxy(ref )
+        }
 
         /*REUSED*/
         static double Mean(List<double> data)
@@ -98,23 +126,28 @@ namespace A3
         }
         /*REUSED END*/
 
-        /*REUSED*/
-        static double stdDev(List<double> data)
+        /*ADDED*/
+        static double Sum(ref List<double> a, ref List<double> b)
         {
-            double tmp = 0;
-            double mean = Mean(data);
-            foreach (double item in data)
+            double sum = 0;
+            for (int i = 0; i < a.Count; i++)
             {
-                tmp += (item - mean) * (item - mean);
+                sum += (a[i] * b[i]);
             }
-            return Math.Sqrt(tmp / (data.Count - 1));
+            return sum;
         }
-        /*REUSED END*/
+        /*ADDED END*/
 
         /*ADDED*/
-        static double B1(ref List<PROGRAM> inputData, )
+        static double Sum(ref List<double> a)
         {
-
+            double sum = 0;
+            for (int i = 0; i < a.Count; i++)
+            {
+                sum += a[i];
+            }
+            return sum;
         }
+        /*ADDED END*/
     }
 }
