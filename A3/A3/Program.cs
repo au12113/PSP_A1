@@ -11,8 +11,7 @@ namespace A3
         /*ADDED*/
         static void Main(string[] args)
         {
-            //string filename = args[0];
-            string filename = "../../testcase.txt";
+            string filename = args[0];
 
             Console.Write("Xk: ");
             double xk = Convert.ToDouble(Console.Read());
@@ -55,11 +54,11 @@ namespace A3
                 //   inputData[column].Add(Convert.ToDouble(item));                     //DELETED
                 //    column++;                                                         //DELETED
                 //}                                                                     //DELETED
-                for(int i =1; i < words.Count(); i++)
-                {
-                    inputData[column].Add(Convert.ToDouble(words[i]));
-                    column++;
-                }
+                for(int i =1; i < words.Count(); i++)                                   //ADDED
+                {                                                                       //ADDED
+                    inputData[column].Add(Convert.ToDouble(words[i]));                  //ADDED
+                    column++;                                                           //ADDED
+                }                                                                       //ADDED
             }
             inputFile.Close();
             return inputData;
