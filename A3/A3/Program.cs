@@ -9,70 +9,56 @@ namespace A3
     class Program
     {
         /*ADDED*/
-        public class PROGRAM
+        static void Main(string[] args)
         {
-            public List<double> _estimatedProxy { get; set; }
-            public List<double> _planAddedModified { get; set; }
-            public List<double> _actualAddedModified { get; set; }
-            public List<double> _actualDevHours { get; set; }
+            //string filename = args[0];
+            string filename = "../../testcase.txt";
+
+            Console.Write("Xk: ");
+            double xk = Convert.ToDouble(Console.Read());
+
+            /*List[0]: Estimated Proxy Size, List[1]: Plan Added and Modified Size.*/
+            /*List[2]: Actual Added and Nodified Size and List[3]: Actual Developemaent Hours.*/
+            List<List<double>> inputProgram = GetData(filename);
+
+            Console.WriteLine("B0: {0:0.000}, B1: {1:0.000}, \nrxy: {2:0.000}, r^2: {3:0.000}, yk: {4:0.000}.",
+                B0(inputProgram[0], inputProgram[3]), B1(inputProgram[0], inputProgram[3]),
+                Rxy(inputProgram[0], inputProgram[3]), R2(inputProgram[0], inputProgram[3]),
+                Yk(inputProgram[0], inputProgram[3], xk));
+            Console.ReadKey();
         }
         /*ADDED END*/
 
-        static void Main(string[] args)
-        {
-            string filename = args[0];
-            PROGRAM inputProgram = GetData(filename);
-            Console.WriteLine("Test 1; B0: {0}, B1: {1}, rxy: {2}, r^2: {3}, yk: {4}",
-                B1(ref inputProgram._estimatedProxy,ref inputProgram._actualAddedModified));
-        }
-
         /*BASE*/
-        static PROGRAM GetData(string filename) //MODIFIED
+        static List<List<double>> GetData(string filename)
         {
             string line;
-            /*trigger for initial List<double> at first line.*/
-            //bool firstRow = true;                                                 //DELETED
-
-            /*count column in each line.*/
-            int column = 0;
-
-            PROGRAM inputData = new PROGRAM();                          //MODIFIED
-            PROGRAM tmpProgram = new PROGRAM();
-
+            bool firstRow = true;   //trigger for initial List<double> at first line.
+            int column = 0; //count column in each line.
+            List<List<double>> inputData = new List<List<double>>();    //try to make 2-dimention list to keep data with dynamic table.
             System.IO.StreamReader inputFile = new System.IO.StreamReader(@filename);
             while ((line = inputFile.ReadLine()) != null)
             {
-                /*note: input file must use '\t' to seperate each column.*/ 
                 string[] words = line.Split('\t');
                 column = 0;
-                //if (firstRow)   //initial List<double> at first time.             //DELETED
-                //{                                                                 //DELETED
-                //    for (int i = 0; i < words.Count(); i++)                       //DELETED
-                //    {                                                             //DELETED
-                //        List<double> dataColumn = new List<double>();             //DELETED
-                //        inputData.Add(dataColumn);  //then add List<double> to parent(List<List<double>>)     //DELETED
-                //    }                                                             //DELETED
-                //    firstRow = false;                                             //DELETED
-                //}                                                                 //DELETED
-                foreach (string item in words)  //add converted data to each list. 
+                if (firstRow)   //initial List<double> at first time.
                 {
-                    switch(column)                                                  //ADDED
-                    {                                                               //ADDED
-                        case 0:                                                     //ADDED
-                            tmpProgram._estimatedProxy.Add(Convert.ToDouble(item));    //ADDED
-                            break;                                                  //ADDED
-                        case 1:                                                     //ADDED
-                            tmpProgram._planAddedModified.Add(Convert.ToDouble(item)); //ADDED
-                            break;                                                  //ADDED
-                        case 2:                                                     //ADDED
-                            tmpProgram._actualAddedModified.Add(Convert.ToDouble(item));   //ADDED
-                            break;                                                  //ADDED
-                        case 3:                                                     //ADDED
-                            tmpProgram._actualDevHours.Add(Convert.ToDouble(item));    //ADDED
-                            break;                                                  //ADDED
-                    }                                                               //ADDED
-                    //inputData[column].Add(Convert.ToDouble(item));                //DELETED
-                    column++;                                                       //DELETED
+                    for (int i = 0; i < words.Count() - 1; i++)                         //MODIFIED
+                    {
+                        List<double> dataColumn = new List<double>();
+                        inputData.Add(dataColumn);  //then add List<double> to parent(List<List<double>>)
+                    }
+                    firstRow = false;
+                }
+                //foreach (string item in words)  //add converted data to each list.    //DELETED
+                //{                                                                     //DELETED
+                //   inputData[column].Add(Convert.ToDouble(item));                     //DELETED
+                //    column++;                                                         //DELETED
+                //}                                                                     //DELETED
+                for(int i =1; i < words.Count(); i++)
+                {
+                    inputData[column].Add(Convert.ToDouble(words[i]));
+                    column++;
                 }
             }
             inputFile.Close();
@@ -81,40 +67,40 @@ namespace A3
         /*BASED END*/
 
         /*ADDED*/
-        static double B1(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        static double B1(List<double> comparedColumn1, List<double> comparedColumn2)
         {
-            return (Sum( ref comparedColumn1, ref comparedColumn2)-(comparedColumn1.Count * Mean(comparedColumn1) * Mean(comparedColumn2)))
-                /(Sum(ref comparedColumn1,ref comparedColumn1) - (comparedColumn1.Count * Mean(comparedColumn1) * Mean(comparedColumn1)));
+            return (Sum(comparedColumn1, comparedColumn2)-(comparedColumn1.Count * Mean(comparedColumn1) * Mean(comparedColumn2)))
+                /(Sum(comparedColumn1, comparedColumn1) - (comparedColumn1.Count * Mean(comparedColumn1) * Mean(comparedColumn1)));
         }
         /*ADDED END*/
 
         /*ADDED*/
-        static double B0(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        static double B0(List<double> comparedColumn1, List<double> comparedColumn2)
         {
-            return Mean(comparedColumn1) - (B1(ref comparedColumn1, ref comparedColumn2) - Mean(comparedColumn2));
+            return Mean(comparedColumn2) - (B1( comparedColumn1,  comparedColumn2) * Mean(comparedColumn1));
         }
         /*ADDED END*/
 
         /*ADDED*/
-        static double Yk(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        static double Yk(List<double> comparedColumn1, List<double> comparedColumn2, double Xk)
         {
-            return B0(ref comparedColumn1, ref comparedColumn2) + (B1(ref comparedColumn1, ref comparedColumn2) * Mean(comparedColumn1));
+            return B0(comparedColumn1, comparedColumn2) + (B1(comparedColumn1, comparedColumn2) * Xk);
         }
         /*ADDED END*/
 
         /*ADDED*/
-        static double Rxy(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        static double Rxy(List<double> comparedColumn1, List<double> comparedColumn2)
         {
-            return ((comparedColumn1.Count * Sum(ref comparedColumn1, ref comparedColumn2)) - (Sum(ref comparedColumn1) * Sum(ref comparedColumn2)))
-                / Math.Sqrt(((comparedColumn1.Count * Sum(ref comparedColumn1, ref comparedColumn1)) - (Sum(ref comparedColumn1) * Sum(ref comparedColumn1)))  
-                * ((comparedColumn1.Count * Sum(ref comparedColumn2,ref comparedColumn2)) - (Sum(ref comparedColumn2) * Sum(ref comparedColumn2))));
+            return ((comparedColumn1.Count * Sum(comparedColumn1, comparedColumn2)) - (Sum(comparedColumn1) * Sum(comparedColumn2)))
+                / Math.Sqrt(((comparedColumn1.Count * Sum(comparedColumn1, comparedColumn1)) - (Sum(comparedColumn1) * Sum(comparedColumn1)))  
+                * ((comparedColumn1.Count * Sum(comparedColumn2, comparedColumn2)) - (Sum(comparedColumn2) * Sum(comparedColumn2))));
         }
         /*ADDED END*/
 
         /*ADDED*/
-        static double R2(ref List<double> comparedColumn1, ref List<double> comparedColumn2)
+        static double R2(List<double> comparedColumn1, List<double> comparedColumn2)
         {
-            return Rxy(ref comparedColumn1, ref comparedColumn2) * Rxy(ref comparedColumn1, ref comparedColumn2);
+            return Rxy(comparedColumn1, comparedColumn2) * Rxy(comparedColumn1, comparedColumn2);
         }
 
         /*REUSED*/
@@ -130,7 +116,7 @@ namespace A3
         /*REUSED END*/
 
         /*ADDED*/
-        static double Sum(ref List<double> a, ref List<double> b)
+        static double Sum(List<double> a, List<double> b)
         {
             double sum = 0;
             for (int i = 0; i < a.Count; i++)
@@ -142,7 +128,7 @@ namespace A3
         /*ADDED END*/
 
         /*ADDED*/
-        static double Sum(ref List<double> a)
+        static double Sum(List<double> a)
         {
             double sum = 0;
             for (int i = 0; i < a.Count; i++)
