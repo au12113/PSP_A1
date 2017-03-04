@@ -1,4 +1,10 @@
-﻿using System;
+﻿/************************************************************************************/
+/* Program Assignment: A3                                                           */
+/* Name: Wasupon Tangaskul                                                          */
+/* Date 2/12/2017                                                                   */
+/* Description: Calculate the regression parameters and correlation coefficients    */
+/************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
