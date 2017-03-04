@@ -10,6 +10,16 @@ namespace A4
     {
         static void Main(string[] args)
         {
+            //string filename = args[0];
+            string filename = "testcase.txt";
+            List<List<double>> inputData = GetData(filename);
+            if(inputData.Count > 1)
+            {
+                inputData.Add(ratio(inputData));
+            }
+            inputData.Add(log(inputData.Last()));
+            sizeRange(inputData.Last());
+            Console.ReadKey();
         }
 
         /*BASED*/
@@ -51,7 +61,7 @@ namespace A4
             List<double> logn = new List<double>();
             foreach(double item in input)
             {
-                Math.Log(Math.E, item);
+                logn.Add(Math.Log(item, Math.E));
             }
             return logn;
         }
@@ -69,8 +79,8 @@ namespace A4
         {
             double mean = Mean(input);
             double SD = stdDev(input);
-            Console.WriteLine("VS: {0}, S: {1}, M: {2}, L: {3}, VL: {4}.",
-                mean - 2*SD, mean - SD, mean, mean + SD, mean + 2*SD);
+            Console.WriteLine("VS: {0:F4}, S: {1:F4}, M: {2:F4}, L: {3:F4}, VL: {4:F4}.",
+                anti_log(mean - 2*SD), anti_log(mean - SD), anti_log(mean), anti_log(mean + SD), anti_log(mean + 2*SD));
         }
         /*ADDED END*/
         
