@@ -10,8 +10,7 @@ namespace A4
     {
         static void Main(string[] args)
         {
-            //string filename = args[0];
-            string filename = "testcase.txt";
+            string filename = args[0];
             List<List<double>> inputData = GetData(filename);
             if(inputData.Count > 1)
             {
