@@ -21,13 +21,14 @@ namespace A5
         {
             int num_seg = 10; //Default
             double previous = Simpson_rule(x, dof, num_seg);
-            double current = 0;
-            do
+            num_seg = 2 * num_seg;
+            double current = Simpson_rule(x, dof, num_seg);
+            while (Math.Abs(current - previous) < 0.00001)
             {
+                previous = current;
                 num_seg = 2 * num_seg;
                 current = Simpson_rule(x, dof, num_seg);
             }
-            while (Math.Abs(current - previous) < 0.00001);
             return current;
         }
 
@@ -46,7 +47,7 @@ namespace A5
         static double T_Distribution(double x, double dof)
         {
             return (Gamma_function((dof + 1) / 2) * Math.Pow((1 + (x * x / dof)), (-dof - 1) / 2))
-                / (Math.Pow(dof * Math.PI, 1 / 2) * Gamma_function(dof / 2));
+                / (Math.Sqrt(dof * Math.PI) * Gamma_function(dof / 2));
         }
 
         static double Gamma_function(double x)
@@ -54,8 +55,8 @@ namespace A5
             if ( x == 1)
                 return 1;
             if (x == 1 / 2)
-                return Math.PI;
-            return (x - 1) * Gamma_function(x-1);
+                return Math.Sqrt(Math.PI);
+            return (x - 1) * Gamma_function(x - 1);
         }
 
         static double Sum_TD_Odd(int n, double width, double dof)
@@ -65,7 +66,7 @@ namespace A5
             {
                 sum += T_Distribution(i*width, dof);
             }
-            return sum;
+            return 4*sum;
         }
 
         static double Sum_TD_Even(int n, double width, double dof)
@@ -75,7 +76,7 @@ namespace A5
             {
                 sum += T_Distribution(i*width, dof);
             }
-            return sum;
+            return 2*sum;
         }
     }
 }
