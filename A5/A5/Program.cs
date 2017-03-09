@@ -11,10 +11,11 @@ namespace A5
         static void Main(string[] args)
         {
             Console.Write("X :");
-            double x = Console.Read();
+            double x = Convert.ToDouble(Console.ReadLine());
             Console.Write("Degree of freedom: ");
-            double dof = Console.Read();
-            Console.WriteLine("T_Distribution is {0:F5}.",minimize_Error(x, dof));
+            double dof = Convert.ToDouble(Console.ReadLine());
+            Console.WriteLine("p is {0:F5}.",minimize_Error(x, dof));
+            Console.ReadKey();
         }
         
         static double minimize_Error(double x, double dof)
@@ -23,7 +24,7 @@ namespace A5
             double previous = Simpson_rule(x, dof, num_seg);
             num_seg = 2 * num_seg;
             double current = Simpson_rule(x, dof, num_seg);
-            while (Math.Abs(current - previous) < 0.00001)
+            while (current - previous > 0.00001)
             {
                 previous = current;
                 num_seg = 2 * num_seg;
@@ -32,7 +33,7 @@ namespace A5
             return current;
         }
 
-        static double Simpson_rule(double x, double dof,int num_seg) //Added num_seg, editted num_seg double -> int 3/9/60
+        static double Simpson_rule(double x, double dof,int num_seg)
         {
             double width = Width(x, (double)num_seg);
             return (width / 3) * (T_Distribution(0, dof) + Sum_TD_Odd(num_seg - 1, width, dof)
@@ -54,7 +55,7 @@ namespace A5
         {
             if ( x == 1)
                 return 1;
-            if (x == 1 / 2)
+            if (x == 0.5)
                 return Math.Sqrt(Math.PI);
             return (x - 1) * Gamma_function(x - 1);
         }
