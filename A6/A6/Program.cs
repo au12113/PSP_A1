@@ -17,13 +17,19 @@ namespace A6
         /*ADDED*/
         static void Main(string[] args)
         {
+            Console.Write("Pn: ");
+            double pn = Convert.ToDouble(Console.ReadLine());
+            Console.Write("Degree of freedom: ");
+            double dof = Convert.ToDouble(Console.ReadLine());
+            Console.WriteLine("x for Pn is: {0:F5}.",Binary_search(pn, dof));
+            Console.ReadKey();
         }
         /*ADDED END*/
 
         /*ADDED*/
         static double Binary_search(double pn, double dof)
         {
-            double x = 1;
+            double x = 0;
             double d = 0.5;
             double px = minimize_Error(x,dof);
             if(Math.Abs(px - pn) <= 0.00001)
@@ -32,13 +38,12 @@ namespace A6
             }
             else if( px > pn)
             {
-                Too_high(pn, x, d, dof);
+                return Too_high(pn, x, d, dof);
             }
-            else if( px < pn)
+            else
             {
-                Too_low(pn, x, d, dof);
+                return Too_low(pn, x, d, dof);
             }
-            
         }
         /*ADDED END*/
 
@@ -53,11 +58,11 @@ namespace A6
             }
             else if (px > pn)
             {
-                Too_high(pn, x, d/2, dof);
+                return Too_high(pn, x, d, dof);
             }
-            else if (px < pn)
+            else
             {
-                Too_low(pn, x, d, dof);
+                return Too_low(pn, x, d/2, dof);
             }
         }
         /*ADDED END*/
@@ -73,11 +78,11 @@ namespace A6
             }
             else if (px > pn)
             {
-                Too_high(pn, x, d/2, dof);
+                return Too_high(pn, x, d/2, dof);
             }
-            else if (px < pn)
+            else
             {
-                Too_low(pn, x, d, dof);
+                return Too_low(pn, x, d, dof);
             }
         }
         /*ADDED END*/
