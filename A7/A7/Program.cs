@@ -1,4 +1,10 @@
-﻿using System;
+﻿/************************************************************************************/
+/* Program Assignment: A7                                                           */
+/* Name: Wasupon Tangaskul                                                          */
+/* Date 3/24/2017                                                                   */
+/* Description: Predition Interval                                                  */
+/************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +18,15 @@ namespace A7
         {
             string filename = "sample.txt";
             List<List<double>> input = GetData(filename);
-            //Console.Write("x: ");
-            //int x = Convert.ToInt32(Console.ReadLine());
-            //Console.Write("y: ");
-            //int y = Convert.ToInt32(Console.ReadLine());
-            int x = 0;
-            int y = 2;
-            double xk = 386;
-            Console.WriteLine("TailArea: {0}, Range: {1}, UPI: {2}, LPI: {3}.", TailArea(input[x], input[y]), Range(input[x], input[y], xk), UPI(input[x], input[y], xk), LPI(input[x], input[y], xk));
+            Console.Write("(0)Estimated Proxy Size, (1)Plan Added and Modified Size, (2)Actual Added and Modified Size, (3)Actual Development Hours\nx: ");
+            int x = Convert.ToInt32(Console.ReadLine());
+            Console.Write("y: ");
+            int y = Convert.ToInt32(Console.ReadLine());
+            Console.Write("xk: ");
+            double xk = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Rxy: {0:F9} \nR^2: {1:F9} \nTailArea: {2:F9}.", Rxy(input[x], input[y]),R2(input[x], input[y]), TailArea(input[x], input[y]));
+            Console.WriteLine("B0: {0:F9} \nB1: {1:F9} \nyk: {2:F9} \nRange: {3:F9} \nUPI: {4:F9} \nLPI: {5:F9}.", B0(input[x], input[y]), B1(input[x], input[y]), Yk(input[x], input[y], xk), Range(input[x], input[y], xk), UPI(input[x], input[y], xk), LPI(input[x], input[y], xk));
+            Console.ReadKey();
         }
 
         /*ADDED*/
@@ -51,7 +58,7 @@ namespace A7
             double mean = Mean(x);
             foreach(int current_x in x)
             {
-                sum_of_normalized = sum_of_normalized * (current_x - mean) * (current_x - mean);
+                sum_of_normalized = sum_of_normalized + ((current_x - mean) * (current_x - mean));
             }
             return Binary_search(0.35, x.Count - 2) * stdDev(x, y) * Math.Sqrt( 1 + (1 / x.Count) + ((xk - mean) * (xk - mean) /  sum_of_normalized));
         }
@@ -260,7 +267,7 @@ namespace A7
             double x = 1;
             double d = 0.5;
             double px = minimize_Error(x, dof);
-            if (Math.Abs(px - pn) <= 0.00001)
+            if (Math.Abs(px - pn) <= 0.0000000001)
             {
                 return x;
             }
@@ -281,7 +288,7 @@ namespace A7
         {
             x = x - d;
             double px = minimize_Error(x, dof);
-            if (Math.Abs(px - pn) <= 0.00001)
+            if (Math.Abs(px - pn) <= 0.0000000001)
             {
                 return x;
             }
@@ -301,7 +308,7 @@ namespace A7
         {
             x = x + d;
             double px = minimize_Error(x, dof);
-            if (Math.Abs(px - pn) <= 0.00001)
+            if (Math.Abs(px - pn) <= 0.0000000001)
             {
                 return x;
             }

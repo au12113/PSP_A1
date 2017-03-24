@@ -32,7 +32,7 @@ namespace A6
             double x = 0;
             double d = 0.5;
             double px = minimize_Error(x,dof);
-            if(Math.Abs(px - pn) <= 0.00001)
+            if(Math.Abs(px - pn) <= 0.0000000001)
             {
                 return x;
             }
@@ -52,7 +52,7 @@ namespace A6
         {
             x = x - d;
             double px = minimize_Error(x, dof);
-            if (Math.Abs(px - pn) <= 0.00001)
+            if (Math.Abs(px - pn) <= 0.0000000001)
             {
                 return x;
             }
@@ -72,7 +72,7 @@ namespace A6
         {
             x = x + d;
             double px = minimize_Error(x, dof);
-            if (Math.Abs(px - pn) <= 0.00001)
+            if (Math.Abs(px - pn) <= 0.0000000001)
             {
                 return x;
             }
